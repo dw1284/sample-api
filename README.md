@@ -22,11 +22,14 @@ Technologies Used
 ##### Http Routing
   - node.js
   - express
+  
 ##### Database
   - postgresql
   - sequelize
+  
 ##### Authentication
   - jwt-simple (json-web-tokens)
+  
 ##### Testing
   - mocha
   - chai
