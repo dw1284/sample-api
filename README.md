@@ -43,19 +43,19 @@ Required installs:
   
 Once you have installed postgresql, open the terminal and create the database and user:
 
-1. You will need to create a database called **sample_api**:
+You will need to create a database called **sample_api**:
 
 ```
 createdb sample_api
 ```
 
-2. Next, start up psql and connect to the **sample_api** database:
+Next, start up psql and connect to the **sample_api** database:
 
 ```
 psql sample_api
 ```
 
-3. Create a user and grant access to sample_api database:
+Create a user and grant access to sample_api database:
 
 ```
 CREATE USER svc_sampleapi_dev WITH PASSWORD 'P6zIAwuvuNWo';
@@ -69,13 +69,13 @@ Running Tests
 
 From the terminal:
 
-1. Unit tests only
+Unit tests only
 
 ```
 npm run unitTest
 ```
 
-2. Integration tests only
+Integration tests only
 
 ```
 npm run integrationTest
