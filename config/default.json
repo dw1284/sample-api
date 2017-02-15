@@ -1,0 +1,22 @@
+{
+  "tier": "development",
+  "development": {
+    "dbConfig": {
+      "user": "svc_sampleapi_dev",
+      "password": "P6zIAwuvuNWo",
+      "database": "sample_api",
+      "host": "localhost",
+      "dialect": "postgres"
+    }
+  },
+  "production": {
+    "dbConfig": {
+      "user": "svc_sampleapi_dev",
+      "password": "P6zIAwuvuNWo",
+      "database": "sample_api",
+      "host": "localhost",
+      "dialect": "postgres",
+      "logging": false
+    }
+  }
+}
