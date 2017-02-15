@@ -7,10 +7,11 @@
 global.Promise = require('bluebird');
 global.models = require('../../models');
 global.testUser = {
-  "username": "TestUser",
-  "password": "387bc09af516a1a77f9b9b4272f38e88739e3c36", // "TestPassword"
-  "uuid": "7b0a0820-f1d2-11e6-a299-35c97126b6fc"
+  username: 'TestUser',
+  password: '387bc09af516a1a77f9b9b4272f38e88739e3c36', // "TestPassword"
+  uuid: '7b0a0820-f1d2-11e6-a299-35c97126b6fc'
 };
+global.authToken = "";
 
 // We do not want to see sequelize query output
 // when running these tests. Set logging to false.
@@ -31,7 +32,10 @@ before(function () {
         return global.testUser.setRoles([role]);
       }
     })
-  ).catch(function (err) {
+  ).then(function () {
+    // Create an auth token that we can use for the tests
+    global.authToken = require('../../helpers/security').createToken(global.testUser);
+  }).catch(function (err) {
     console.log(err);
   });
 });
