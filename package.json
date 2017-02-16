@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./app.js",
-    "test": "npm run unitTest",
+    "test": "npm run unitTest && npm run integrationTest",
     "unitTest": "mocha ./test/unit",
     "integrationTest": "mocha -t 10000 ./test/integration"
   },
