@@ -34,7 +34,7 @@ this.validateToken = function (token) {
     let updatedToken = jwt.encode(payload, secretWord);
     return {
       success: true,
-      payload: payload,
+      tokenPayload: payload,
       updatedToken: updatedToken
     };
   } catch (err) {
@@ -43,6 +43,23 @@ this.validateToken = function (token) {
       message: `Token validation failed: ${err.message}`
     };
   }
+};
+
+// Update a token's expiration date
+this.refreshToken = function (token) {
+  let payload = jwt.decode(token, secretWord);
+  payload.exp = Math.floor(new Date().getTime() / 1000) + (15 * 60); // Update expiration to 15 mins from now
+  return jwt.encode(payload, secretWord);
+};
+
+// Returns true if user has all specified roles
+this.hasRoles = function (user, requiredRoleNames) {
+  let userRoles = user.roles || [];
+  return requiredRoleNames.every(
+    requiredRoleName => userRoles.filter(
+      userRole => userRole.name === requiredRoleName
+    ).length > 0
+  );
 };
 
 module.exports = this;

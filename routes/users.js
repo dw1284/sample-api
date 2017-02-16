@@ -1,42 +1,13 @@
 const security = require('../helpers/security');
+const checkAuthorization = require('../helpers/checkAuthorization');
 const models = require('../models');
 const Promise = require('bluebird');
 const express = require('express');
 const router = express.Router();
 
 // Search for users based on specified criteria
-router.get('/', function (req, res, next) {
+router.get('/', checkAuthorization(['admin']), function (req, res, next) {
   let searchParams = req.query;
-  let token = req.headers.accesstoken;
-  let validationResult = security.validateToken(token);
-  
-  // If json web token is invalid
-  if (!validationResult.success) {
-    return res.status(401).json({
-      status: 'fail',
-      data: {
-        message: 'Invalid token.'
-      }
-    });
-  }
-  
-  // Since we are returning user data, we do extra
-  // validation here. A user can only retrieve data
-  // about themselves, so there really is no reason
-  // for a regular user to be able to perform this
-  // search. Consequently, we only proceed if the
-  // user is an admin.
-  let requestingUser = validationResult.payload.user;
-  let roles = requestingUser.roles || [];
-  let isAdmin = roles.some(role => role.name === 'admin');
-  if (!isAdmin) {
-    return res.status(403).json({
-      status: 'fail',
-      data: {
-        message: 'Not authorized to search user data.'
-      }
-    });
-  }
   
   // Retrieve the data and send back JSON
   return models.user.findAll({
@@ -64,7 +35,7 @@ router.get('/', function (req, res, next) {
     return res.status(200).json({
       status: 'success',
       data: results,
-      updatedToken: token
+      updatedToken: req.authorizationResult.updatedToken
     });
   }).catch(function (err) {
     return res.status(500).json({
@@ -75,27 +46,13 @@ router.get('/', function (req, res, next) {
 });
 
 // Retrieve a single user object based on provided userId
-// (userId as in auto-incrementing identification number
-// not to be confused with username)
-router.get('/:userId', function (req, res, next) {
+router.get('/:userId', checkAuthorization(), function (req, res, next) {
   let userId = req.params.userId;
-  let token = req.headers.accesstoken;
-  let validationResult = security.validateToken(token);
-  
-  // If json web token is invalid
-  if (!validationResult.success) {
-    return res.status(401).json({
-      status: 'fail',
-      data: {
-        message: 'Invalid token.'
-      }
-    });
-  }
   
   // Since we are returning user data, we do extra
   // validation here. A user can only retrieve data
   // about themselves, unless the user is an admin.
-  let requestingUser = validationResult.payload.user;
+  let requestingUser = req.authorizationResult.tokenPayload.user;
   let roles = requestingUser.roles || [];
   let isAdmin = roles.some(role => role.name === 'admin');
   if (requestingUser.id !== userId && !isAdmin) {
@@ -116,7 +73,7 @@ router.get('/:userId', function (req, res, next) {
       return res.status(200).json({
         status: 'success',
         data: result.dataValues,
-        updatedToken: token
+        updatedToken: req.authorizationResult.updatedToken
       });
     } else {
       return res.status(404).json({
@@ -160,32 +117,20 @@ router.put('/', function (req, res, next) {
 });
 
 // Save update to existing user
-router.post('/:userId', function (req, res, next) {
+router.post('/:userId', checkAuthorization(), function (req, res, next) {
   let userId = req.params.userId;
-  let token = req.headers.accesstoken;
-  let validationResult = security.validateToken(token);
-  
-  // If json web token is invalid
-  if (!validationResult.success) {
-    return res.status(401).json({
-      status: 'fail',
-      data: {
-        message: 'Invalid token.'
-      }
-    });
-  }
   
   // Since we are manipulating user data, we do extra
   // validation here. A user can only manipulate data
   // about themselves, unless the user is an admin.
-  let requestingUser = validationResult.payload.user;
+  let requestingUser = req.authorizationResult.tokenPayload.user;
   let roles = requestUser.roles || [];
   let isAdmin = roles.some(role => role.name === 'admin');
   if (requestingingUser.username !== username && !isAdmin) {
     return res.status(403).json({
       status: 'fail',
       data: {
-        message: 'Not authorized to retrieve user data.'
+        message: 'Not authorized to manipulate post data.'
       }
     });
   }
@@ -218,7 +163,7 @@ router.post('/:userId', function (req, res, next) {
     return res.status(200).json({
       status: 'success',
       data: req.body,
-      updatedToken: token
+      updatedToken: req.authorizationResult.updatedToken
     });
   }).catch(function (err) {
     return res.status(500).json({
