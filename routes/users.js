@@ -49,13 +49,9 @@ router.get('/', checkAuthorization(['admin']), function (req, res, next) {
 router.get('/:userId', checkAuthorization(), function (req, res, next) {
   let userId = req.params.userId;
   
-  // Since we are returning user data, we do extra
-  // validation here. A user can only retrieve data
-  // about themselves, unless the user is an admin.
+  // A non-admin user can only retrieve their own data
   let requestingUser = req.authorizationResult.tokenPayload.user;
-  let roles = requestingUser.roles || [];
-  let isAdmin = roles.some(role => role.name === 'admin');
-  if (requestingUser.id !== userId && !isAdmin) {
+  if (requestingUser.id !== userId && !security.hasRoles(requestingUser, ['admin'])) {
     return res.status(403).json({
       status: 'fail',
       data: {
@@ -120,13 +116,9 @@ router.put('/', function (req, res, next) {
 router.post('/:userId', checkAuthorization(), function (req, res, next) {
   let userId = req.params.userId;
   
-  // Since we are manipulating user data, we do extra
-  // validation here. A user can only manipulate data
-  // about themselves, unless the user is an admin.
+  // A non-admin user can only manipulate their own data
   let requestingUser = req.authorizationResult.tokenPayload.user;
-  let roles = requestUser.roles || [];
-  let isAdmin = roles.some(role => role.name === 'admin');
-  if (requestingingUser.username !== username && !isAdmin) {
+  if (requestingingUser.username !== username && !security.hasRoles(requestingUser, ['admin'])) {
     return res.status(403).json({
       status: 'fail',
       data: {
