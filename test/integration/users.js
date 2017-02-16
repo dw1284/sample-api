@@ -54,7 +54,7 @@ describe('routes/users', function () {
       });
   });
   
-  it('should return status 200 and a valid JSON object containing an array of users on /users/:userId GET', function (done) {
+  it('should return status 200 and a valid JSON object containing a single user on /users/:userId GET', function (done) {
     chai
       .request(server)
       .get(`/users/${global.testUser.id}`)
