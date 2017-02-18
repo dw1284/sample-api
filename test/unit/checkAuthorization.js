@@ -18,7 +18,8 @@ describe('helpers/checkAuthorization', function () {
       roles: [{ id: 1, name: 'admin' }]
     };
     this.req = {
-      headers: {}
+      headers: {},
+      query: {}
     };
     this.res = {
       resCode: undefined,
@@ -48,7 +49,31 @@ describe('helpers/checkAuthorization', function () {
   
   it('should return undefined indicating an authorized user with admin role', function () {  
     this.req.headers.accesstoken = security.createToken(this.adminUser);
-    let result = this.checkAuthorization(['admin'])(this.req, this.res, this.next);
+    let result = this.checkAuthorization({ requiredRoles: ['admin'] })(this.req, this.res, this.next);
+    should.not.exist(result);
+  });
+  
+  it('should return undefined indicating an authorized user with required propertyPath', function () {  
+    this.req.headers.accesstoken = security.createToken(this.regularUser);
+    this.req.query.username = 'RegularUser';
+    let requiredProperty = { requestPath: 'query.username', tokenComparePath: 'user.username' };
+    let result = this.checkAuthorization({ requiredProp: requiredProperty })(this.req, this.res, this.next);
+    should.not.exist(result);
+  });
+  
+  it('should return undefined indicating an authorized user without required property path, but with override role', function () {  
+    this.req.headers.accesstoken = security.createToken(this.adminUser);
+    this.req.query.username = 'DifferentUsername';
+    let requiredProperty = { requestPath: 'query.username', tokenComparePath: 'user.username', overrideRoles: ['admin'] };
+    let result = this.checkAuthorization({ requiredProp: requiredProperty })(this.req, this.res, this.next);
+    should.not.exist(result);
+  });
+  
+  it('should return undefined indicating an authorized user with admin role and required propertyPath', function () {  
+    this.req.headers.accesstoken = security.createToken(this.adminUser);
+    this.req.query.username = 'AdminUser';
+    let requiredProperty = { requestPath: 'query.username', tokenComparePath: 'user.username' };
+    let result = this.checkAuthorization({ requiredRoles: ['admin'], requiredProp: requiredProperty })(this.req, this.res, this.next);
     should.not.exist(result);
   });
   
@@ -67,7 +92,36 @@ describe('helpers/checkAuthorization', function () {
   
   it('should return authorization failure due to user lacking admin role', function () {  
     this.req.headers.accesstoken = security.createToken(this.regularUser);
-    let result = this.checkAuthorization(['admin'])(this.req, this.res, this.next);
+    let result = this.checkAuthorization({ requiredRoles: ['admin'] })(this.req, this.res, this.next);
+    result.should.be.json;
+    result.should.have.property('status', 403);
+    result.should.have.property('body');
+    result.body.should.be.json;
+    result.body.should.have.property('status', 'fail');
+    result.body.should.have.property('data');
+    result.body.data.should.be.json;
+    result.body.data.should.have.property('message');
+  });
+  
+  it('should return authorization failure due to lack of required propertyPath', function () {  
+    this.req.headers.accesstoken = security.createToken(this.regularUser);
+    let requiredProperty = { requestPath: 'query.missingProperty' };
+    let result = this.checkAuthorization({ requiredProp: requiredProperty })(this.req, this.res, this.next);
+    result.should.be.json;
+    result.should.have.property('status', 403);
+    result.should.have.property('body');
+    result.body.should.be.json;
+    result.body.should.have.property('status', 'fail');
+    result.body.should.have.property('data');
+    result.body.data.should.be.json;
+    result.body.data.should.have.property('message');
+  });
+  
+  it('should return authorization failure due to unmatching propertyPath value', function () {  
+    this.req.headers.accesstoken = security.createToken(this.regularUser);
+    this.req.query.username = 'DifferentUsername';
+    let requiredProperty = { requestPath: 'query.username', tokenComparePath: 'user.username' };
+    let result = this.checkAuthorization({ requiredProp: requiredProperty })(this.req, this.res, this.next);
     result.should.be.json;
     result.should.have.property('status', 403);
     result.should.have.property('body');

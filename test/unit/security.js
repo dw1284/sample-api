@@ -22,6 +22,13 @@ describe('helpers/security', function () {
       uuid: '6b0a0820-f1d2-11e6-a299-35c97126b6fc',
       roles: [{ id: 1, name: 'admin' }]
     };
+    this.superUser = {
+      id: 2,
+      username: 'AdminUser',
+      password: 'TestPassword',
+      uuid: '6b0a0820-f1d2-11e6-a299-35c97126b6fc',
+      roles: [{ id: 1, name: 'superUser' }, { id: 2, name: 'godlikePowers' }]
+    };
     this.validToken = this.security.createToken(this.regularUser);
     this.expiredToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUZXN0UHJlcGFyYXRpb25BcGkiLCJleHAiOjE0ODcwODQzODcsInVzZXIiOnsidXNlcm5hbWUiOiJUZXN0VXNlciJ9fQ.BhjoaFmWq0YQbt1rTivVv_Hy4_S2stGgLNTUvscNPd0';
     this.invalidToken = 'this is an invalid token';
@@ -31,7 +38,7 @@ describe('helpers/security', function () {
   // Begin unit tests
   /////////////////////////////
   
-  it('should return string hashed and salted', function () {
+  it('should return a salted hash', function () {
     let hashedSaltedPassword = this.security.securifyPassword(this.regularUser.password, this.regularUser.uuid);
     hashedSaltedPassword.should.be.ok;
     hashedSaltedPassword.should.be.a('string');
@@ -70,8 +77,18 @@ describe('helpers/security', function () {
     updatedToken.should.be.a('string');
   });
   
-  it('should return true if user has required role, false otherwise', function () {
+  it('should return true if user has all specified roles', function () {
     this.security.hasRoles(this.regularUser, ['admin']).should.be.false;
     this.security.hasRoles(this.adminUser, ['admin']).should.be.true;
+    this.security.hasRoles(this.adminUser, ['admin', 'superUser']).should.be.false;
+    this.security.hasRoles(this.superUser, ['superUser']).should.be.true;
+    this.security.hasRoles(this.superUser, ['superUser', 'godlikePowers']).should.be.true;
+    this.security.hasRoles(this.superUser, ['superUser', 'godlikePowers', 'readonly']).should.be.false;
+  });
+  
+  it('should return true if user has at least one of specified roles', function () {
+    this.security.hasAnyRole(this.regularUser, ['admin', 'superUser', 'godlikePowers']).should.be.false;
+    this.security.hasAnyRole(this.adminUser, ['admin', 'superUser', 'godlikePowers']).should.be.true;
+    this.security.hasAnyRole(this.superUser, ['admin', 'superUser', 'godlikePowers']).should.be.true;
   });
 });

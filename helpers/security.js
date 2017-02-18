@@ -62,4 +62,14 @@ this.hasRoles = function (user, requiredRoleNames) {
   );
 };
 
+// Returns true if user has at least one of specified roles
+this.hasAnyRole = function (user, roleNames) {
+  let userRoles = user.roles || [];
+  return roleNames.some(
+    roleName => userRoles.filter(
+      userRole => userRole.name === roleName
+    ).length > 0
+  );
+};
+
 module.exports = this;
