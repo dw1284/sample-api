@@ -148,4 +148,34 @@ router.post('/:userId',
   }
 );
 
+// Delete an existing user
+router.delete('/:userId',
+  checkAuthorization({ requiredProp: { requestPath: 'params.userId', tokenComparePath: 'user.id', overrideRoles: ['admin'] } }),
+  function (req, res, next) {
+    let userId = req.params.userId;
+    let force = req.query.force || false;
+    
+    // Delete the user from the DB
+    return models.user.destroy({ where: { id: userId }, force: force }).then(function (rowsAffected) {
+      if (rowsAffected) {
+        return res.status(200).json({
+          status: 'success',
+          data: { rowsAffected: rowsAffected },
+          updatedToken: req.authorizationResult.updatedToken
+        });
+      } else {
+        return res.status(404).json({
+          status: 'fail',
+          data: { message: `UserId not found: ${userId}` }
+        });
+      }
+    }).catch(function (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || err
+      });
+    });
+  }
+);
+
 module.exports = router;

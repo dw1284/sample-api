@@ -5,7 +5,7 @@ const should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('routes/users', function () {
+describe('routes/users', function () {  
   it('should return status 401 unauthorized due to lack of auth token on /users GET', function (done) {
     chai
       .request(server)
@@ -65,6 +65,54 @@ describe('routes/users', function () {
         response.body.should.have.property('status', 'success');
         response.body.should.have.property('data');
         response.body.data.should.have.property('username');
+        done();
+      });
+  });
+  
+  it('should return status 200 and a valid JSON object containing an inserted user on /users PUT', function (done) {
+    chai
+      .request(server)
+      .put('/users')
+      .set('accessToken', global.authToken)
+      .send(global.dummyUser)
+      .end(function (error, response, body) {
+        response.should.have.status(200);
+        response.should.be.json;
+        response.body.should.have.property('status', 'success');
+        response.body.should.have.property('data');
+        response.body.data.should.have.property('username');
+        global.dummyUser = response.body.data;
+        done();
+      });
+  });
+  
+  it('should return status 200 and a valid JSON object containing an updated user on /users POST', function (done) {
+    chai
+      .request(server)
+      .post(`/users/${global.dummyUser.id}`)
+      .set('accessToken', global.authToken)
+      .send(global.dummyUser)
+      .end(function (error, response, body) {
+        response.should.have.status(200);
+        response.should.be.json;
+        response.body.should.have.property('status', 'success');
+        response.body.should.have.property('data');
+        response.body.data.should.have.property('username');
+        done();
+      });
+  });
+  
+  it('should return status 200 indicating 1 row deleted on /users/:userId DELETE', function (done) {
+    chai
+      .request(server)
+      .delete(`/users/${global.dummyUser.id}?force=true`)
+      .set('accessToken', global.authToken)
+      .end(function (error, response, body) {
+        response.should.have.status(200);
+        response.should.be.json;
+        response.body.should.have.property('status', 'success');
+        response.body.should.have.property('data');
+        response.body.data.should.have.property('rowsAffected', 1);
         done();
       });
   });
