@@ -21,6 +21,7 @@ app.use(cookieParser());
 
 // Load routes
 app.use('/authenticate', require('./routes/authenticate'));
+app.use('/roles', require('./routes/roles'));
 app.use('/users', require('./routes/users'));
 
 // Default route (if no route provided in url)

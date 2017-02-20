@@ -13,6 +13,7 @@ global.testUser = global.models.user.build({
   uuid: '7b0a0820-f1d2-11e6-a299-35c97126b6fc'
   // Admin role gets set when we save
 });
+global.testRole = global.models.role.build({ name: 'TestRole' });
 
 // We do not want to see sequelize query output
 // when running these tests. Set logging to false.
@@ -28,7 +29,8 @@ before(function (done) {
             global.authToken = security.createToken(global.testUser);
           });
         });
-      })
+      }),
+      global.testRole.save()
     ).then(function () {
       done();
     }).catch(function (err) {
@@ -41,7 +43,8 @@ before(function (done) {
 after(function () {
   // Cleanup database
   return Promise.join(
-    global.testUser.destroy({ force: true })
+    global.testUser.destroy({ force: true }),
+    global.testRole.destroy({ force: true })
   ).catch(function (err) {
     console.log(err);
   });
