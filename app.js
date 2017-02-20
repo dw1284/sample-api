@@ -49,6 +49,9 @@ models.sequelize.sync().then(function () {
     // Otherwise, let the host provide the port
     app.listen(process.env.PORT);
   }
+  app.emit('serverStarted');
+}).catch(function (err) {
+  console.log(err);
 });
 
 module.exports = app;

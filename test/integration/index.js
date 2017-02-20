@@ -2,6 +2,7 @@ const security = require('../../helpers/security');
 const Promise = require('bluebird');
 
 // Set up some globals which can be used in each test file
+global.server = require('../../app');
 global.models = require('../../models');
 global.authToken = '' // This gets set after we save our testUser;
 global.testUser = global.models.user.build({
@@ -16,9 +17,8 @@ global.testUser = global.models.user.build({
 global.models.sequelize.options.logging = false;
 
 // Set up our test environment
-before(function () {
-  // Insert some objects in the database
-  return models.sequelize.sync().then(function () {  
+before(function (done) {
+  global.server.on('serverStarted', function () {
     return Promise.join(
       global.testUser.save().then(function () {
         return global.testUser.setRoles([1]).then(function () {
@@ -27,9 +27,11 @@ before(function () {
           });
         });
       })
-    )}
-  ).catch(function (err) {
-    console.log(err);
+    ).then(function () {
+      done();
+    }).catch(function (err) {
+      done(err);
+    });
   });
 });
 
