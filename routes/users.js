@@ -9,9 +9,6 @@ const router = express.Router();
 router.get('/',
   checkAuthorization({ requiredRoles: ['admin'] }),
   function (req, res, next) {
-    let searchParams = req.query;
-    
-    // Retrieve the data and send back JSON
     return models.user.findAll({
       include: [models.role],
       where: [
@@ -23,14 +20,14 @@ router.get('/',
         (? IS NULL OR "user"."created_at" <= ?) AND
         (? IS NULL OR "user"."updated_at" >= ?) AND
         (? IS NULL OR "user"."updated_at" <= ?)`,
-        searchParams.id, searchParams.id,
-        searchParams.username, `%${searchParams.username}%`,
-        searchParams.must_update_username, searchParams.must_update_username,
-        searchParams.must_update_password, searchParams.must_update_password,
-        searchParams.created_at_low, searchParams.created_at_low,
-        searchParams.created_at_high, searchParams.created_at_high,
-        searchParams.updated_at_low, searchParams.updated_at_low,
-        searchParams.updated_at_high, searchParams.updated_at_high
+        req.query.id, req.query.id,
+        req.query.username, `%${req.query.username}%`,
+        req.query.must_update_username, req.query.must_update_username,
+        req.query.must_update_password, req.query.must_update_password,
+        req.query.created_at_low, req.query.created_at_low,
+        req.query.created_at_high, req.query.created_at_high,
+        req.query.updated_at_low, req.query.updated_at_low,
+        req.query.updated_at_high, req.query.updated_at_high
       ],
       order: ['username']
     }).then(function (results) {
@@ -52,23 +49,17 @@ router.get('/',
 router.get('/:userId',
   checkAuthorization({ requiredProp: { requestPath: 'params.userId', tokenComparePath: 'user.id', overrideRoles: ['admin'] } }),
   function (req, res, next) {
-    let userId = req.params.userId;
-    
-    // Retrieve the data and send back JSON
-    return models.user.findById(userId, {
-      // Join the user's roles
-      include: [models.role]
-    }).then(function (result) {
+    return models.user.findById(req.params.userId, { include: [models.role] }).then(function (result) {
       if (result) {
         return res.status(200).json({
           status: 'success',
-          data: result.dataValues,
+          data: result,
           updatedToken: req.authorizationResult.updatedToken
         });
       } else {
         return res.status(404).json({
           status: 'fail',
-          data: { message: `UserId not found: ${userId}` }
+          data: { message: `UserId not found: ${req.params.userId}` }
         });
       }
     }).catch(function (err) {
@@ -82,20 +73,15 @@ router.get('/:userId',
 
 // Create a new user
 router.put('/', function (req, res, next) {
-  let user = models.user.build(req.body);
-  
-  // Hash and salt the password
-  user.password = security.securifyPassword(user.password, user.uuid);
-  
-  // Save the user, and any associated tables
-  return user.save().then(function (result) {
-    return user.setRoles((req.body.roles || []).map(function (role) { return models.role.build(role) })).then(function () {
-      return models.user.findById(result.dataValues.id, { include: [models.role] });
+  req.body.password = security.securifyPassword(req.body.password, req.body.uuid);
+  return models.user.create(req.body).then(function (user) {
+    return user.setRoles((req.body.roles || []).map(function (role) { return role.id })).then(function () {
+      return user.reload({ include: models.role }).then(function () { return user; });
     });
   }).then(function (user) {
     return res.status(200).json({
       status: 'success',
-      data: user.dataValues
+      data: user
     });
   }).catch(function (err) {
     return res.status(500).json({
@@ -109,34 +95,30 @@ router.put('/', function (req, res, next) {
 router.post('/:userId',
   checkAuthorization({ requiredProp: { requestPath: 'params.userId', tokenComparePath: 'user.id', overrideRoles: ['admin'] } }),
   function (req, res, next) {
-    let userId = req.params.userId;
-    
-    // Ensure that we are posting to the correct userId
-    req.body.id = userId;
-    
-    // If the password is 20 chars or less, it neeeds
+    // If the password is 20 chars or less, it needs
     // to be salted and hashed
-    if (req.body.password.length <= 20) {
+    if (req.body.password.length <= 20)
       req.body.password = security.securifyPassword(req.body.password, req.body.uuid);
-    }
     
     // Update the user and any associated tables
-    return models.user.findById(userId, { include: [models.role] }).then(function (user) {
+    return models.user.findById(req.params.userId, { include: [models.role] }).then(function (user) {
       if (user) {
         return Promise.join(
           user.update(req.body),
-          user.setRoles((req.body.roles || user.roles).map(function (role) { return role.dataValues ? role : models.role.build(role) }))
-        );
+          user.setRoles((req.body.roles || user.roles).map(function (role) { return role.id }))
+        ).then(function () {
+          return user.reload({ include: models.role }).then(function () { return user; });
+        });
       } else {
         return res.status(404).json({
           status: 'fail',
-          data: { message: `UserId not found: ${userId}` }
+          data: { message: `UserId not found: ${req.params.userId}` }
         });
       }
-    }).then(function () {
+    }).then(function (user) {
       return res.status(200).json({
         status: 'success',
-        data: req.body,
+        data: user,
         updatedToken: req.authorizationResult.updatedToken
       });
     }).catch(function (err) {
@@ -154,8 +136,6 @@ router.delete('/:userId',
   function (req, res, next) {
     let userId = req.params.userId;
     let force = req.query.force || false;
-    
-    // Delete the user from the DB
     return models.user.destroy({ where: { id: userId }, force: force }).then(function (rowsAffected) {
       if (rowsAffected) {
         return res.status(200).json({
