@@ -53,6 +53,12 @@ describe('helpers/checkAuthorization', function () {
     should.not.exist(result);
   });
   
+  it('should return undefined indicating an authorized user with one, but not all, of specified roles', function () {  
+    this.req.headers.accesstoken = security.createToken(this.adminUser);
+    let result = this.checkAuthorization({ requireAnyRole: ['admin', 'superUser'] })(this.req, this.res, this.next);
+    should.not.exist(result);
+  });
+  
   it('should return undefined indicating an authorized user with required propertyPath', function () {  
     this.req.headers.accesstoken = security.createToken(this.regularUser);
     this.req.query.username = 'RegularUser';
@@ -93,6 +99,19 @@ describe('helpers/checkAuthorization', function () {
   it('should return authorization failure due to user lacking admin role', function () {  
     this.req.headers.accesstoken = security.createToken(this.regularUser);
     let result = this.checkAuthorization({ requiredRoles: ['admin'] })(this.req, this.res, this.next);
+    result.should.be.json;
+    result.should.have.property('status', 403);
+    result.should.have.property('body');
+    result.body.should.be.json;
+    result.body.should.have.property('status', 'fail');
+    result.body.should.have.property('data');
+    result.body.data.should.be.json;
+    result.body.data.should.have.property('message');
+  });
+  
+  it('should return authorization failure due to user lacking any of the specified roles', function () {  
+    this.req.headers.accesstoken = security.createToken(this.regularUser);
+    let result = this.checkAuthorization({ requireAnyRole: ['admin', 'superUser'] })(this.req, this.res, this.next);
     result.should.be.json;
     result.should.have.property('status', 403);
     result.should.have.property('body');

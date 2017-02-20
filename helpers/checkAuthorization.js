@@ -5,6 +5,7 @@ const utils = require('./utils');
 module.exports = function (options) {
   // Option defaults
   if (options === undefined) options = {};
+  if (options.requireAnyRole === undefined) options.requireAnyRole = [];
   if (options.requiredRoles === undefined) options.requiredRoles = [];
   if (options.requiredProp === undefined) options.requiredProp = {};
   
@@ -22,7 +23,8 @@ module.exports = function (options) {
     }
     
     // Optional: Require the user to have specified role/roles.
-    let roleValidationResult = security.hasRoles(tokenValidationResult.tokenPayload.user, options.requiredRoles);
+    let roleValidationResult1 = security.hasAnyRole(tokenValidationResult.tokenPayload.user, options.requireAnyRole);
+    let roleValidationResult2 = security.hasRoles(tokenValidationResult.tokenPayload.user, options.requiredRoles);
     
     // Optional: Require that a specified property exist on the request object.
     // Optional: Require the specified property to be equal to a separate specified property from the token payload.
@@ -31,7 +33,7 @@ module.exports = function (options) {
     let requiredValOverridden = options.requiredProp.overrideRoles ? security.hasAnyRole(tokenPayload.user, options.requiredProp.overrideRoles) : false;
     let propertyValidationResult = requiredValOverridden || utils.hasPropertyPath(req, options.requiredProp.requestPath, requiredVal);
     
-    if (!roleValidationResult || !propertyValidationResult) {
+    if (!roleValidationResult1 || !roleValidationResult2 || !propertyValidationResult) {
       // Not authorized
       return res.status(403).json({
         status: 'fail',
