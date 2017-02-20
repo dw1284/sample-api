@@ -1,12 +1,12 @@
-const security = require('../../helpers/security');
+const security = require('../../lib/helpers/security');
 const chai = require('chai');
 const should = chai.should();
 
-describe('helpers/checkAuthorization', function () {
+describe('lib/checkAuthorization', function () {
   // Preparation
   before(function () {
     // The module that we will be testing
-    this.checkAuthorization = require('../../helpers/checkAuthorization');
+    this.checkAuthorization = require('../../lib/checkAuthorization');
     
     // Dummy data...for testing purposes
     this.regularUser = {

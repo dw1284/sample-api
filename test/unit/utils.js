@@ -1,11 +1,11 @@
 const chai = require('chai');
 const should = chai.should();
 
-describe('helpers/utils', function () {
+describe('lib/helpers/utils', function () {
   // Preparation
   before(function () {
     // The module that we will be testing
-    this.utils = require('../../helpers/utils');
+    this.utils = require('../../lib/helpers/utils');
   });
   
   /////////////////////////////

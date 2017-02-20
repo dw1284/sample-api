@@ -1,4 +1,4 @@
-const checkAuthorization = require('../helpers/checkAuthorization');
+const checkAuthorization = require('../lib/checkAuthorization');
 const models = require('../models');
 const Promise = require('bluebird');
 const express = require('express');

@@ -1,5 +1,5 @@
-const security = require('../helpers/security');
-const checkAuthorization = require('../helpers/checkAuthorization');
+const security = require('../lib/helpers/security');
+const checkAuthorization = require('../lib/checkAuthorization');
 const models = require('../models');
 const Promise = require('bluebird');
 const express = require('express');

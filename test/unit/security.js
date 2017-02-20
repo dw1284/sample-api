@@ -1,11 +1,11 @@
 const chai = require('chai');
 const should = chai.should();
 
-describe('helpers/security', function () {
+describe('lib/helpers/security', function () {
   // Preparation
   before(function () {
     // The module that we will be testing
-    this.security = require('../../helpers/security');
+    this.security = require('../../lib/helpers/security');
     
     // Dummy data...for testing purposes
     this.regularUser = {

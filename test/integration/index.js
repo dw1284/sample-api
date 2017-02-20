@@ -1,4 +1,4 @@
-const security = require('../../helpers/security');
+const security = require('../../lib/helpers/security');
 const Promise = require('bluebird');
 
 process.testing = true;

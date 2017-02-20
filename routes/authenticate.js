@@ -1,4 +1,4 @@
-const security = require('../helpers/security');
+const security = require('../lib/helpers/security');
 const models = require('../models');
 const express = require('express');
 const router = express.Router();
