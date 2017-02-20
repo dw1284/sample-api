@@ -25,18 +25,12 @@ app.use('/roles', require('./routes/roles'));
 app.use('/users', require('./routes/users'));
 
 // Default route (if no route provided in url)
-// NOTE: This route gets used by some front end apps to
-// 'wake up' a sleeping server. In order to fully accomplish
-// that, we also need to 'wake up' the database server, so
-// we go ahead and hit the database here as well.
 app.use('/', function (req, res) {
-  // Do a database hit just to wake up the DB.
-  // This will return nothing, but it will succeed
-  // in waking up a sleeping database.
-  models.user.findAll({
-    where: { id: 0 }
-  }).then(function () {
+  models.sequelize.authenticate().then(function() {
     res.send('Sample Api');
+  }).catch(function (err) {
+    // DB is down or otherwise unable to connect, give generic message
+    res.send('Sample Api is not available at the moment.');
   });
 });
 
