@@ -45,19 +45,19 @@ Once you have installed postgresql, open the terminal and create the database an
 
 You will need to create a database called **sample_api**:
 
-```
+```shell
 createdb sample_api
 ```
 
 Next, start up psql and connect to the **sample_api** database:
 
-```
+```shell
 psql sample_api
 ```
 
 Create a user and grant access to sample_api database:
 
-```
+```shell
 CREATE USER svc_sampleapi_dev WITH PASSWORD 'P6zIAwuvuNWo';
 GRANT ALL PRIVILEGES ON DATABASE "sample_api" to svc_sampleapi_dev;
 ```
@@ -67,16 +67,22 @@ You should now be able to run **npm install** and then **npm start**. Sequelize 
 Running Tests
 -------------
 
+All tests
+
+```shell
+npm test
+```
+
 From the terminal:
 
 Unit tests only
 
-```
+```shell
 npm run unitTest
 ```
 
 Integration tests only
 
-```
+```shell
 npm run integrationTest
 ```
