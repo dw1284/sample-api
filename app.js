@@ -12,7 +12,7 @@ const models = require('./models');
 const app = express();
 
 // Load middleware that will execute on each request
-if (tier === 'development') {
+if (tier === 'development' && !process.testing) {
   app.use(logger('dev'));
 }
 app.use(bodyParser.json({ limit: '5mb' }));
@@ -45,7 +45,9 @@ models.sequelize.sync().then(function () {
   if (tier === 'development') {
     // For development, run on port 3000
     app.listen(3000, function () {
-      console.log('Example app listening on port 3000!');
+      if (!process.testing) { // Avoid unnecessary log output when unit testing
+        console.log('Example app listening on port 3000!');
+      }
     });
   } else {
     // Otherwise, let the host provide the port

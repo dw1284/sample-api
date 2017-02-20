@@ -1,6 +1,8 @@
 const security = require('../../helpers/security');
 const Promise = require('bluebird');
 
+process.testing = true;
+
 // Set up some globals which can be used in each test file
 global.server = require('../../app');
 global.models = require('../../models');
