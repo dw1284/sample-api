@@ -7,6 +7,12 @@
       "database": "sample_api",
       "host": "localhost",
       "dialect": "postgres"
+    },
+    "logConfig": {
+      "writeToConsole": true,
+      "writeToFile": true,
+      "filepath": "./app.log",
+      "fileMaxSize": 10240
     }
   },
   "production": {
@@ -17,6 +23,12 @@
       "host": "localhost",
       "dialect": "postgres",
       "logging": false
+    },
+    "logConfig": {
+      "writeToConsole": false,
+      "writeToFile": true,
+      "filepath": "./app.log",
+      "fileMaxSize": 10240
     }
   }
 }

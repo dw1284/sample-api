@@ -1,4 +1,5 @@
 const security = require('../lib/helpers/security');
+const logger = require('../lib/helpers/logger');
 const checkAuthorization = require('../lib/checkAuthorization');
 const models = require('../models');
 const Promise = require('bluebird');
@@ -37,9 +38,11 @@ router.get('/',
         updatedToken: req.authorizationResult.updatedToken
       });
     }).catch(function (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || err
+      return logger.log(err).finally(function () {
+        return res.status(500).json({
+          status: 'error',
+          message: err.message || err
+        });
       });
     });
   }
@@ -63,9 +66,11 @@ router.get('/:userId',
         });
       }
     }).catch(function (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || err
+      return logger.log(err).finally(function () {
+        return res.status(500).json({
+          status: 'error',
+          message: err.message || err
+        });
       });
     });
   }
@@ -84,9 +89,11 @@ router.put('/', function (req, res, next) {
       data: user
     });
   }).catch(function (err) {
-    return res.status(500).json({
-      status: 'error',
-      message: err.message || err
+    return logger.log(err).finally(function () {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || err
+      });
     });
   });
 });
@@ -122,9 +129,11 @@ router.post('/:userId',
         updatedToken: req.authorizationResult.updatedToken
       });
     }).catch(function (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || err
+      return logger.log(err).finally(function () {
+        return res.status(500).json({
+          status: 'error',
+          message: err.message || err
+        });
       });
     });
   }
@@ -150,9 +159,11 @@ router.delete('/:userId',
         });
       }
     }).catch(function (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || err
+      return logger.log(err).finally(function () {
+        return res.status(500).json({
+          status: 'error',
+          message: err.message || err
+        });
       });
     });
   }

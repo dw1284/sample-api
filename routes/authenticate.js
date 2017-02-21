@@ -1,3 +1,4 @@
+const logger = require('../lib/helpers/logger');
 const security = require('../lib/helpers/security');
 const models = require('../models');
 const express = require('express');
@@ -42,9 +43,11 @@ router.post('/', function (req, res, next) {
       }
     });
   }).catch(function (err) {
-    return res.status(500).json({
-      status: 'error',
-      message: err.message || err
+    return logger.log(err).finally(function () {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || err
+      });
     });
   });
 });

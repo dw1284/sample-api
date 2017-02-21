@@ -34,6 +34,7 @@ Technologies Used
   - mocha
   - chai
   - chai-http
+  - proxyquire
   
 Dependencies
 ------------
