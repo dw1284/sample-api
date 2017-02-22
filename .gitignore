@@ -2,3 +2,5 @@
 node_modules
 npm-debug.log
 app.log
+.DS_Store
+Thumbs.db
