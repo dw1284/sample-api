@@ -5,7 +5,7 @@ const should = chai.should();
 const proxyquire = require('proxyquire');
 
 // We will inject our own test functions into the fs module here
-let fsStub = {
+const fsStub = {
   stat: function (file, callback) {
     if (file) {
       callback(null, { size: file.size });
