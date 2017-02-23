@@ -1,5 +1,5 @@
-const logger = require('../lib/helpers/logger');
 const security = require('../lib/helpers/security');
+const handleError = require('../lib/handleError');
 const models = require('../models');
 const express = require('express');
 const router = express.Router();
@@ -42,14 +42,7 @@ router.post('/', function (req, res, next) {
         message: `Authentication failed.`
       }
     });
-  }).catch(function (err) {
-    return logger.log(err).finally(function () {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || err
-      });
-    });
-  });
+  }).catch(handleError(res));
 });
 
 module.exports = router;

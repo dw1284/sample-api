@@ -1,6 +1,6 @@
 const security = require('../lib/helpers/security');
-const logger = require('../lib/helpers/logger');
 const checkAuthorization = require('../lib/checkAuthorization');
+const handleError = require('../lib/handleError');
 const models = require('../models');
 const Promise = require('bluebird');
 const express = require('express');
@@ -37,14 +37,7 @@ router.get('/',
         data: results,
         updatedToken: req.authorizationResult.updatedToken
       });
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
@@ -65,14 +58,7 @@ router.get('/:userId',
           data: { message: `UserId not found: ${req.params.userId}` }
         });
       }
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
@@ -88,14 +74,7 @@ router.put('/', function (req, res, next) {
       status: 'success',
       data: user
     });
-  }).catch(function (err) {
-    return logger.log(err).finally(function () {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || err
-      });
-    });
-  });
+  }).catch(handleError(res));
 });
 
 // Save update to existing user
@@ -128,14 +107,7 @@ router.post('/:userId',
         data: user,
         updatedToken: req.authorizationResult.updatedToken
       });
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
@@ -158,14 +130,7 @@ router.delete('/:userId',
           data: { message: `UserId not found: ${userId}` }
         });
       }
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 

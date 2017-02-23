@@ -1,5 +1,5 @@
-const logger = require('../lib/helpers/logger');
 const checkAuthorization = require('../lib/checkAuthorization');
+const handleError = require('../lib/handleError');
 const models = require('../models');
 const Promise = require('bluebird');
 const express = require('express');
@@ -23,14 +23,7 @@ router.get('/',
         data: results,
         updatedToken: req.authorizationResult.updatedToken
       });
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
@@ -51,14 +44,7 @@ router.get('/:roleId',
           data: { message: `RoleId not found: ${req.params.roleId}` }
         });
       }
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
@@ -71,14 +57,7 @@ router.put('/',
         status: 'success',
         data: result
       });
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
@@ -101,14 +80,7 @@ router.post('/:roleId',
         data: result,
         updatedToken: req.authorizationResult.updatedToken
       });
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
@@ -133,14 +105,7 @@ router.delete('/:roleId',
           data: { message: `RoleId not found: ${roleId}` }
         });
       }
-    }).catch(function (err) {
-      return logger.log(err).finally(function () {
-        return res.status(500).json({
-          status: 'error',
-          message: err.message || err
-        });
-      });
-    });
+    }).catch(handleError(res));
   }
 );
 
