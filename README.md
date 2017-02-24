@@ -1,4 +1,4 @@
-SampleApi
+sample-api
 ==========
 
 Introduction
