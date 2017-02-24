@@ -11,10 +11,9 @@ This is a barebones API for node.js including the following features:
   - User roles
   - Routes for basic CRUD operations
   - Routes for search operations
+  - Error logging
   - Unit testing for individual functions
   - Integration testing for routes
-
-**Note:** This is a personal project to help me learn my way around. It may contain inefficient code and/or be full of bad practices. I am just learning after-all.
 
 Technologies Used
 -----------------
